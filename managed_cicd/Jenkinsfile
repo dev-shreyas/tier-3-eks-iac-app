@@ -1,0 +1,5 @@
+stage('clone repo') {
+    steps {
+        git branch: 'main', url: 'https://github.com/dev-shreyas/tier-3-eks-iac-app.git'
+    }
+}
