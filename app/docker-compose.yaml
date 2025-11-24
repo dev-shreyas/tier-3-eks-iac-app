@@ -16,6 +16,6 @@ services:
       dockerfile: Dockerfile
     #image: nodeapp-fontend:v1
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - backend
