@@ -1,3 +1,8 @@
+pipeline {
+    agent any
+
+stages {
+
 stage('clone repo') {
     steps {
         git branch: 'main', url: 'https://github.com/dev-shreyas/tier-3-eks-iac-app.git'
@@ -18,5 +23,7 @@ stage('Deploy docker containers locally using docker compose') {
             docker compose -f app/docker-compose.yaml down || true
             docker compose -f app/docker-compose.yaml up -d --build
         '''
+            }
+        }
     }
 }
