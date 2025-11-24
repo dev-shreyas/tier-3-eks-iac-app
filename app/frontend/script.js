@@ -27,7 +27,7 @@ form.addEventListener("submit", async (e) => {
   const message = document.getElementById("message").value;
 
   try {
-    const res = await fetch("http://localhost:3001/api/submit", {
+    const res = await fetch("http://app-backend:3001/api/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, message })
@@ -49,7 +49,7 @@ form.addEventListener("submit", async (e) => {
 
 async function loadMessages() {
   try {
-    const res = await fetch("http://localhost:3001/api/messages");
+    const res = await fetch("http://app-backend:3001/api/messages");
     const data = await res.json();
 
     const container = document.getElementById("messages");
