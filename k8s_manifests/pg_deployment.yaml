@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pg-deploy
+  name: pg-deploy
+  namespace: tier3-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pg-deploy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: pg-deploy
+    spec:
+      containers:
+      - image: postgres:15
+        name: postgres
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: pg-db-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pg-db-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: pg-db-secret
+              key: POSTGRES_DB
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: pgdata
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - "$(POSTGRES_USER)"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: pg-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-service
+  namespace: tier3-apps
+spec:
+  selector:
+    app: pg-deploy
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

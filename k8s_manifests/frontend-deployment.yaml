@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend-deploy
+  name: frontend-deploy
+  namespace: tier3-apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-deploy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: frontend-deploy
+    spec:
+      containers:
+      - image: shreyas02/nodejs-frontend:v1
+        name: nodejs-frontend
+        ports:
+        - containerPort: 80
+        resources: {
+          limits: {
+            memory: "256Mi",
+            cpu: "500m"
+          },
+          requests: { 
+          memory: "128Mi",
+          cpu: "250m"
+          }
+        }
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: tier3-apps
+spec:
+  selector:
+    app: frontend-deploy
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP

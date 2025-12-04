@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tier3-ingress
+  namespace: tier3-apps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: tier3.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: frontend-deploy
+              port:
+                number: 80
+          path: /(.*)
+          pathType: ImplementationSpecific
+        - backend:
+            service:
+              name: backend-deploy
+              port:
+                number: 3001
+          path: /api(/|$)(.*)
+          pathType: ImplementationSpecific
