@@ -55,16 +55,16 @@ spec:
             port: 3001
           initialDelaySeconds: 15
           periodSeconds: 20
-        # resources: {
-        #   limits: {
-        #     cpu: "500m",
-        #     memory: "256Mi"
-        #   },
-        #   requests: {
-        #     cpu: "250m",
-        #     memory: "128Mi"
-        #   }
-        # }
+        resources: {
+          limits: {
+            memory: "512Mi",
+            cpu: "500m"
+          },
+          requests: { 
+          memory: "128Mi",
+          cpu: "250m"
+          }
+        }
 
 ---
 
