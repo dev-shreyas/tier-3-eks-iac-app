@@ -1,0 +1,77 @@
+# k8s/postgres-headless-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pg-stateful-svc
+  namespace: tier3-apps
+  labels:
+    type: pg-statefulset
+spec:
+  clusterIP: None
+  selector:
+    type: pg-statefulset
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432
+---
+# k8s/pg-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pg-statefulset
+  namespace: tier3-apps
+spec:
+  serviceName: pg-stateful-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      type: pg-statefulset
+  template:
+    metadata:
+      labels:
+        type: pg-statefulset
+    spec:
+      containers:
+        - name: postgres-db
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-db-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-db-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: pg-db-secret
+                  key: POSTGRES_DB
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              # use shell so env var expands
+              command: ["sh", "-c", "pg_isready -U $POSTGRES_USER"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U $POSTGRES_USER"]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

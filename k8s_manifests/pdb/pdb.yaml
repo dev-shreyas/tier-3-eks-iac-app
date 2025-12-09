@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-deploy-pdb
+  namespace: tier3-apps
+spec:
+  minAvailable: 3
+  selector:
+    matchLabels:
+      app: backend-deploy
+status:
+  currentHealthy: 0
+  desiredHealthy: 0
+  disruptionsAllowed: 0
+  expectedPods: 0
